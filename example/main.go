@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"time"
+
+	"github.com/byliuyang/eventbus"
 )
 
 func main() {
-	bus := NewEventBus()
+	bus := eventbus.NewEventBus()
 
-	notificationChannel := make(DataChannel)
+	notificationChannel := make(eventbus.DataChannel)
 	notification := "notification"
 	bus.Subscribe(notification, notificationChannel)
 
