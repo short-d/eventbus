@@ -1,20 +1,14 @@
-# EventBus
-Minimal Event Bus written in Go
-
-## Example
-```go
 package main
 
 import (
 	"fmt"
-	"github.com/byliuyang/eventbus/eventbus"
 	"time"
 )
 
 func main() {
-	bus := eventbus.NewEventBus()
+	bus := NewEventBus()
 
-	notificationChannel := make(eventbus.DataChannel)
+	notificationChannel := make(DataChannel)
 	notification := "notification"
 	bus.Subscribe(notification, notificationChannel)
 
@@ -32,10 +26,3 @@ func main() {
 	bus.UnSubscribe(notification, notificationChannel)
 	time.Sleep(1 * time.Second)
 }
-```
-
-## Author
-Harry Liu - [byliuyang](https://github.com/byliuyang)
-
-## License
-This project is maintained under MIT license
