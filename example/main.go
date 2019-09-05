@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/byliuyang/eventbus"
@@ -14,17 +15,23 @@ func main() {
 	notification := "notification"
 	bus.Subscribe(notification, notificationChannel)
 
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(1)
+
 	go func() {
 		for {
 			select {
 			case data := <-notificationChannel:
 				fmt.Println(data)
+				bus.UnSubscribe(notification, notificationChannel)
+				waitGroup.Done()
 			}
 		}
 	}()
 
-	time.Sleep(2 * time.Second)
-	bus.Publish(notification, "Hello!")
-	bus.UnSubscribe(notification, notificationChannel)
-	time.Sleep(1 * time.Second)
+	go func() {
+		time.Sleep(2 * time.Second)
+		bus.Publish(notification, "Hello!")
+	}()
+	waitGroup.Wait()
 }
