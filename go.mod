@@ -1,3 +1,3 @@
-module github.com/byliuyang/eventbus
+module eventbus
 
 go 1.13
