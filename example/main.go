@@ -1,11 +1,10 @@
 package main
 
 import (
+	"eventbus"
 	"fmt"
 	"sync"
 	"time"
-
-	"github.com/byliuyang/eventbus"
 )
 
 func main() {
