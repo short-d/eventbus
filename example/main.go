@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/short-d.com/eventbus"
+	"github.com/short-d/eventbus"
 )
 
 func main() {
