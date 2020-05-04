@@ -35,8 +35,18 @@ func (e EventBus) UnSubscribe(eventName string, ch DataChannel) {
 
 	for idx, subscriber := range subscribers {
 		if subscriber == ch {
-			e.events[eventName] = append(subscribers[:idx], subscribers[idx+1:]...)
-			return
+			// the order of subscribers does not matter
+			subscribers[idx], subscribers[len(subscribers)-1] = subscribers[len(subscribers)-1], nil
+			e.events[eventName] = subscribers[:len(subscribers)-1]
+
+			// drain the channel
+			for {
+				select {
+				case <-ch:
+				default:
+					return
+				}
+			}
 		}
 	}
 }
