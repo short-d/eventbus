@@ -39,7 +39,7 @@ func (e EventBus) UnSubscribe(eventName string, ch DataChannel) {
 			subscribers[idx], subscribers[len(subscribers)-1] = subscribers[len(subscribers)-1], nil
 			e.events[eventName] = subscribers[:len(subscribers)-1]
 
-			// drain the channel
+			// drain the channel, not closing it based on The Channel Closing Principle
 			for {
 				select {
 				case <-ch:
@@ -60,9 +60,11 @@ func (e EventBus) Publish(eventName string, data Data) {
 		return
 	}
 
-	for _, subscriber := range subscribers {
-		subscriber <- data
-	}
+	go func(data Data, subscribers []DataChannel) {
+		for _, ch := range subscribers {
+			ch <- data
+		}
+	}(data, subscribers)
 }
 
 func NewEventBus() EventBus {
