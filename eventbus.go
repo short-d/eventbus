@@ -35,18 +35,18 @@ func (e EventBus) UnSubscribe(eventName string, ch DataChannel) {
 
 	for idx, subscriber := range subscribers {
 		if subscriber == ch {
+			// drain the channel, not closing it based on The Channel Closing Principle
+			go func() {
+				defer close(ch)
+				for range ch {
+				}
+			}()
+
 			// the order of subscribers does not matter
-			subscribers[idx], subscribers[len(subscribers)-1] = subscribers[len(subscribers)-1], nil
+			swapSubscribers(idx, len(subscribers)-1, subscribers)
 			e.events[eventName] = subscribers[:len(subscribers)-1]
 
-			// drain the channel, not closing it based on The Channel Closing Principle
-			for {
-				select {
-				case <-ch:
-				default:
-					return
-				}
-			}
+			return
 		}
 	}
 }
@@ -65,6 +65,14 @@ func (e EventBus) Publish(eventName string, data Data) {
 			ch <- data
 		}
 	}(data, subscribers)
+}
+
+func swapSubscribers(i, j int, subscribers []DataChannel) {
+	if len(subscribers)-1 < i || len(subscribers)-1 < j {
+		return
+	}
+
+	subscribers[i], subscribers[j] = subscribers[j], subscribers[i]
 }
 
 func NewEventBus() EventBus {
