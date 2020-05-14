@@ -35,7 +35,7 @@ func (e EventBus) UnSubscribe(eventName string, ch DataChannel) {
 
 	for idx, subscriber := range subscribers {
 		if subscriber == ch {
-			// drain the channel, not closing it based on The Channel Closing Principle
+			// drain the channel
 			go func() {
 				defer close(ch)
 				for range ch {
