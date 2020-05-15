@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -22,9 +21,10 @@ func main() {
 		for {
 			select {
 			case data := <-notificationChannel:
-				fmt.Println(data)
-				bus.UnSubscribe(notification, notificationChannel)
-				waitGroup.Done()
+				if data != nil {
+					bus.UnSubscribe(notification, notificationChannel)
+					waitGroup.Done()
+				}
 			}
 		}
 	}()
