@@ -36,14 +36,14 @@ func (e EventBus) UnSubscribe(eventName string, ch DataChannel) {
 	for idx, subscriber := range subscribers {
 		if subscriber == ch {
 			// drain the channel
-			go func() {
-				defer close(ch)
+			defer func() {
+				close(ch)
 				for range ch {
 				}
 			}()
 
 			// the order of subscribers does not matter
-			swapSubscribers(idx, len(subscribers)-1, subscribers)
+			swap(idx, len(subscribers)-1, subscribers)
 			e.events[eventName] = subscribers[:len(subscribers)-1]
 
 			return
@@ -59,16 +59,15 @@ func (e EventBus) Publish(eventName string, data Data) {
 	if !ok {
 		return
 	}
-
-	go func(data Data, subscribers []DataChannel) {
+	go func() {
 		for _, ch := range subscribers {
 			ch <- data
 		}
-	}(data, subscribers)
+	}()
 }
 
-func swapSubscribers(i, j int, subscribers []DataChannel) {
-	if len(subscribers)-1 < i || len(subscribers)-1 < j {
+func swap(i, j int, subscribers []DataChannel) {
+	if i >= len(subscribers) || j >= len(subscribers) {
 		return
 	}
 

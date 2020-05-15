@@ -22,9 +22,13 @@ func main() {
 		for {
 			select {
 			case data := <-notificationChannel:
-				fmt.Println(data)
-				bus.UnSubscribe(notification, notificationChannel)
-				waitGroup.Done()
+				if data != nil {
+					fmt.Println(data)
+					bus.UnSubscribe(notification, notificationChannel)
+					waitGroup.Done()
+				}
+			default:
+				break
 			}
 		}
 	}()
