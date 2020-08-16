@@ -12,7 +12,7 @@ type EventBus struct {
 	events map[string][]DataChannel
 }
 
-func (e EventBus) Subscribe(eventName string, ch DataChannel) {
+func (e *EventBus) Subscribe(eventName string, ch DataChannel) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
@@ -24,7 +24,7 @@ func (e EventBus) Subscribe(eventName string, ch DataChannel) {
 	e.events[eventName] = []DataChannel{ch}
 }
 
-func (e EventBus) UnSubscribe(eventName string, ch DataChannel) {
+func (e *EventBus) UnSubscribe(eventName string, ch DataChannel) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
@@ -51,7 +51,7 @@ func (e EventBus) UnSubscribe(eventName string, ch DataChannel) {
 	}
 }
 
-func (e EventBus) Publish(eventName string, data Data) {
+func (e *EventBus) Publish(eventName string, data Data) {
 	e.mutex.RLock()
 	defer e.mutex.RUnlock()
 
@@ -59,11 +59,9 @@ func (e EventBus) Publish(eventName string, data Data) {
 	if !ok {
 		return
 	}
-	go func() {
-		for _, ch := range subscribers {
-			ch <- data
-		}
-	}()
+	for _, ch := range subscribers {
+		ch <- data
+	}
 }
 
 func swap(i, j int, subscribers []DataChannel) {
